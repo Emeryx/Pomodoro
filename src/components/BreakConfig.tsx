@@ -6,14 +6,16 @@ interface BreakConfigProps {length: number}
 const BreakConfig : React.FC<BreakConfigProps> = ({length}) => {
     return (
         <div id='break-container'>
-            <h3 id='break-label' className='text-xl'>BREAK</h3>
-            <button id='break-increment'>
-                <ArrowUp />
-            </button>
-            <h3 id='break-length'>{length}</h3>
-            <button id='break-decrement'>
-                <ArrowDown />
-            </button>
+            <h3 id='break-label' className='text-2xl text-white'>Break</h3>
+            <div className='change'>
+                <button id='break-increment' className='config-btn'>
+                    <ArrowUp />
+                </button>
+                <h3 id='break-length' className='text-2xl text-white'>{length}</h3>
+                <button id='break-decrement' className='config-btn'>
+                    <ArrowDown />
+                </button>
+            </div>
       </div>
     )
 }

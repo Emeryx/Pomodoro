@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './App.css';
+import './App.sass';
 import './index.css'
 
 import BreakConfig from './components/BreakConfig';
@@ -14,13 +14,13 @@ function App() {
   const [sessionLength, setSessionLength] = useState(25)
 
   return (
-    <div className="App">
-      <div id='configuration-container'>
+    <div className="App flex flex-col gap-6 justify-center pb-40 md:mx-32 mx-8">
+      <Timer />
+      <Control />
+      <div id='configuration-container' className='flex flex-row gap-x-12 gap-y-6 justify-center flex-wrap'>
         <BreakConfig length={breakLength} />
         <SessionConfig length={sessionLength} />
       </div>
-      <Timer />
-      <Control />
     </div>
   );
 }

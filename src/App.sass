@@ -1,0 +1,66 @@
+
+@font-face 
+    font-family: Poppins
+    src: url(./assets/Poppins.ttf)
+
+    
+@font-face 
+    font-family: JetBrainsMono
+    src: url(./assets/JBMono.ttf)
+
+@font-face 
+    font-family: Poppins-SemiBold
+    src: url(./assets/Poppins-SemiBold.ttf)
+
+
+body
+    background-image: url(./assets/bg.jpg)
+    background-repeat: no-repeat
+    background-position: center
+    background-size: cover
+    height:100vh
+
+.App // Main app
+    // Background opacity and horizontal margin initialization
+    @apply bg-zinc-950 bg-opacity-65 h-screen
+    font-family: 'Poppins-SemiBold'
+
+// Time left (mm:ss) and time lengths
+#time-left, #session-length, #break-length
+    font-family: 'JetBrainsMono'
+
+// Break and session length config containers
+#break-container, #session-container
+    @apply flex flex-col gap-2 justify-center items-center
+
+// Configuration buttons (decrement and increment break and session values)
+.config-btn
+    @apply h-[40px] w-[40px] p-2 bg-blue-800 rounded-full text-white flex justify-center items-center
+
+// Icons inside configuration buttons
+.config-btn > *
+    @apply h-[24px] w-[24x]
+
+// Reset and stop buttons' icons
+#reset *, #start_stop * 
+    @apply h-[24px] w-[24px]
+
+// Break session length config parent container
+.change
+    @apply flex flex-row gap-4 justify-center items-center
+
+// Controller container (Pause and start)
+#control-container
+    @apply flex flex-row gap-6 justify-center items-center
+
+#reset, #start_stop
+    @apply bg-slate-500 h-[48px] w-[48px] flex justify-center items-center bg-gradient-to-r from-blue-700 to-purple-700 rounded-full text-white
+
+
+// Timer container
+#timer-container
+    @apply flex flex-col gap-1 justify-center items-center
+
+// Config labels
+#session-label, #break-label
+    font-family: 'Poppins'

@@ -1,26 +1,29 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState } from 'react';
 import './App.css';
+import './index.css'
+
+import BreakConfig from './components/BreakConfig';
+import SessionConfig from './components/SessionConfig';
+import Timer from './components/Timer';
+import Control from './components/Control';
 
 function App() {
+
+  const [breakLength, setBreakLength] = useState(5);
+
+  const [sessionLength, setSessionLength] = useState(25)
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div id='configuration-container'>
+        <BreakConfig length={breakLength} />
+        <SessionConfig length={sessionLength} />
+      </div>
+      <Timer />
+      <Control />
     </div>
   );
 }
 
 export default App;
+

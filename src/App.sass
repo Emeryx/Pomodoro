@@ -26,7 +26,7 @@ body
     font-family: 'Poppins-SemiBold'
 
 // Time left (mm:ss) and time lengths
-#time-left, #session-length, #break-length
+#time-left, #session-length, #break-length, .CircularProgressbar-text
     font-family: 'JetBrainsMono'
 
 // Break and session length config containers
@@ -59,8 +59,11 @@ body
 
 // Timer container
 #timer-container
-    @apply flex flex-col gap-1 justify-center items-center
+    @apply flex flex-col gap-8 justify-center items-center
 
 // Config labels
 #session-label, #break-label
     font-family: 'Poppins'
+
+.CircularProgressbar .CircularProgressbar-path
+    @apply bg-gradient-to-r from-blue-700 to-purple-700

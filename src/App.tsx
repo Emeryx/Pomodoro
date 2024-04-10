@@ -4,7 +4,7 @@ import "./index.css";
 
 import BreakConfig from "./components/BreakConfig";
 import SessionConfig from "./components/SessionConfig";
-import Timer from "./components/Timer";
+import TimerTwo from "./components/Timer";
 import Control from "./components/Control";
 
 // TODO: Handle #time-left and the timer mechanism in general since there is no time state and the play/pause function does nothing. Time should be displayed in MM:SS format
@@ -16,18 +16,24 @@ function App() {
 
     // State hooks
 
-    const [breakLength, setBreakLength] = useState(5);
+    const [breakLength, setBreakLength] = useState(5); // in minutes
 
-    const [sessionLength, setSessionLength] = useState(25);
+    const [sessionLength, setSessionLength] = useState(25); // in minutes
+
+    const [session, toggleSession] = useState(true); // true at first because a session will have to begin
+
+    const [active, toggleActive] = useState(false); // false at first because it's idle
 
     // Modifying functions for the config container
 
     const modifyBreak = (increment: boolean) => {
+        if(active) return; // Don't do anything if active, toggleActive(false) may be needed in the future
         if (increment && (breakLength + 1 ) <= 60) return setBreakLength(breakLength + 1);
         else if(!increment && (breakLength - 1) > 0) return setBreakLength(breakLength - 1);
     };
 
     const modifySession = (increment: boolean) => {
+        if(active) return; // Don't do anything if active, toggleActive(false) may be needed in the future
         if (increment && (sessionLength + 1 ) <= 60) return setSessionLength(sessionLength + 1);
         else if(!increment && (sessionLength - 1) > 0) return setSessionLength(sessionLength - 1);
     }
@@ -42,12 +48,12 @@ function App() {
     // Pause function
 
     const pause = () => {
-
+        toggleActive(!active);
     }
 
     return (
         <div className="App flex flex-col gap-6 justify-center pb-40 md:mx-32 mx-8">
-        <Timer />
+        <TimerTwo sessionLength={sessionLength*60} breakLength={breakLength*60} session={session} active={active} />
         <Control resetFunc={reset} startStopFunc={pause} />
         <div
             id="configuration-container"

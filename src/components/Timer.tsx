@@ -3,7 +3,7 @@ import "react-circular-progressbar/dist/styles.css";
 import GradientSVG from "../utils/GradientSVG";
 import { useEffect, useState, useRef } from "react";
 
-const Timer = () => {
+/*const Timer = () => {
   return (
     <div id="timer-container">
       <h3 id="time-left" className="text-4xl text-white">
@@ -11,25 +11,36 @@ const Timer = () => {
       </h3>
     </div>
   );
-};
+};*/
 
 interface TimerProps {
   sessionLength: number; // session length in seconds
   breakLength: number; // break length in seconds
-  session: boolean; // true - a session is in place, false - a break is in place
   active: boolean; // true - timer is active, false - timer is idle
 }
 
-const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, session, active }) => { // lengths had already been multiplied by 60
-  
+const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, active }) => { // lengths had already been multiplied by 60
+    
+    const retrieveAudio = ()  => {
+        const audioTempEl = document.getElementById("beep") as HTMLAudioElement;
+        audioTempEl.volume = 0.25;
+        audioEl.current = audioTempEl?audioTempEl:null;
+    }
+
     const idCSS = "gradient";
 
     // const [timerValue, setTimerValue] = useState(0);
 
+    // Hooks 
+
     const timerValue = useRef(0);
 
-    const [timerDisplay, setTimerDisplay] = useState(0);
+    const session = useRef(true);
 
+    const audioEl = useRef<HTMLAudioElement | null>();
+
+    const [timerDisplay, setTimerDisplay] = useState(0);
+    
     const timeFormatter = (length: number) => {
         const min: string = ( length / 60 ) < 10 ? `0${Math.floor(length/60)}` : `${Math.floor(length/60)}` ;
         const sec : string = ( length % 60 ) < 10 ? `0${length%60}` : `${length%60}` ;
@@ -38,20 +49,17 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, session, a
 
     const [formattedTime, setFormattedTime] = useState(timeFormatter(session?sessionLength:breakLength));
 
+
     // Component loaded & active changed - Set Circular progressbar text ID to "time-left"
     useEffect(() => {
-        console.log("inner html set");
         const text = document.querySelector(".CircularProgressbar-text");
-        console.log(text);
         if (!text) return;
         text.setAttribute("id", "time-left");
     }, [active]);
 
-    // "Active" is changed
-    useEffect(()=> {
-        if(!active) return; // If the timer is idle do nothing, Otherwise...
+    const timerFunc = () => {
         const interval = setInterval(()=>{ // Increment timerValue every 1000ms (1 second)
-            if(( ( timerValue.current < sessionLength && session ) || (timerValue.current < breakLength && !session ) && active )){
+            if(( (( timerValue.current < sessionLength && session ) || (timerValue.current < breakLength && !session )) && active )){
                 timerValue.current++;
                 setTimerDisplay(timerValue.current);
                 setFormattedTime(session?timeFormatter(sessionLength-timerValue.current):timeFormatter(breakLength-timerValue.current));
@@ -60,13 +68,22 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, session, a
             else{
                 clearInterval(interval);
             }
-        },1000); 
-        return () => {
-            const audioEl = document.getElementById("beep") as HTMLAudioElement;
-            audioEl?.play();
-            clearInterval(interval);
-        }
-    },[active])
+        },1000);
+        return () => clearInterval(interval); 
+    }
+    // "Active" is changed
+    useEffect(()=> {
+        if(!active) return; // If the timer is idle do nothing, Otherwise...
+        const timer = timerFunc();
+        return (() => { // End of timer
+            console.log("Session/Break ended!");
+            audioEl.current?.play(); // Play audio
+            session.current = !session.current; // Toggle session status 
+            timerValue.current = 0; // Reset timer value
+            setTimerDisplay(0); // Reset timer value
+            timerFunc(); // Reruns the timer on next session / break
+        })
+    },[active]);
 
     // Lengths changed
     useEffect(()=>{
@@ -75,7 +92,9 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, session, a
 
     return (
         <div id="timer-container">
-            <audio id="beep" src="../assets/Beep.mp3" className=""></audio>
+            <audio id="beep" className="" onLoadedData={retrieveAudio} controls>
+                <source src="https://www.soundjay.com/buttons/sounds/button-2.mp3" type="audio/mpeg"/>
+            </audio>
             <GradientSVG />
             <CircularProgressbar
                 className="w-48 h-48"

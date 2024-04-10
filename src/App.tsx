@@ -20,8 +20,6 @@ function App() {
 
     const [sessionLength, setSessionLength] = useState(25); // in minutes
 
-    const [session, toggleSession] = useState(true); // true at first because a session will have to begin
-
     const [active, toggleActive] = useState(false); // false at first because it's idle
 
     // Modifying functions for the config container
@@ -53,7 +51,7 @@ function App() {
 
     return (
         <div className="App flex flex-col gap-6 justify-center pb-40 md:mx-32 mx-8">
-        <TimerTwo sessionLength={sessionLength*60} breakLength={breakLength*60} session={session} active={active} />
+        <TimerTwo sessionLength={sessionLength*60} breakLength={breakLength*60} active={active} />
         <Control resetFunc={reset} startStopFunc={pause} />
         <div
             id="configuration-container"

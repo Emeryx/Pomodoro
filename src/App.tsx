@@ -16,9 +16,9 @@ function App() {
 
     // State hooks
 
-    const [breakLength, setBreakLength] = useState(5); // in minutes
+    const [breakLength, setBreakLength] = useState(2); // in minutes
 
-    const [sessionLength, setSessionLength] = useState(25); // in minutes
+    const [sessionLength, setSessionLength] = useState(1); // in minutes
 
     const [active, toggleActive] = useState(false); // false at first because it's idle
 
@@ -46,7 +46,7 @@ function App() {
     // Pause function
 
     const pause = () => {
-        toggleActive(!active);
+        toggleActive(prevActive => !prevActive);
     }
 
     return (

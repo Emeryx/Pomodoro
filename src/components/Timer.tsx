@@ -19,7 +19,7 @@ interface TimerProps {
   active: boolean; // true - timer is active, false - timer is idle
 }
 
-const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, active }) => { // lengths had already been multiplied by 60
+const TimerTwo: React.FC<TimerProps> = ({ sessionLength , breakLength , active }) => { // lengths had already been multiplied by 60
     
     const retrieveAudio = ()  => {
         const audioTempEl = document.getElementById("beep") as HTMLAudioElement;
@@ -35,7 +35,7 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, active }) 
 
     const timerValue = useRef(0);
 
-    const session = useRef(true);
+    const [session,setSession] = useState(true);
 
     const audioEl = useRef<HTMLAudioElement | null>();
 
@@ -55,35 +55,39 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, active }) 
         const text = document.querySelector(".CircularProgressbar-text");
         if (!text) return;
         text.setAttribute("id", "time-left");
-    }, [active]);
+    }, []);
 
     const timerFunc = () => {
+        console.log("New session/break begin/resume!");
         const interval = setInterval(()=>{ // Increment timerValue every 1000ms (1 second)
             if(( (( timerValue.current < sessionLength && session ) || (timerValue.current < breakLength && !session )) && active )){
+                console.log(!active);
                 timerValue.current++;
                 setTimerDisplay(timerValue.current);
                 setFormattedTime(session?timeFormatter(sessionLength-timerValue.current):timeFormatter(breakLength-timerValue.current));
                 console.log("TIMER: "+timerValue.current);
             }
             else{
+                if(active){
+                    console.log("Session/break ended!");
+                    audioEl.current?.play(); // Play audio
+                    setSession(!session); // Toggle session status 
+                }
+                else{
+                    console.log("Is inactive! oopsie");
+                    timerValue.current = timerDisplay;
+                }
                 clearInterval(interval);
             }
         },1000);
         return () => clearInterval(interval); 
     }
-    // "Active" is changed
+    // "Active" or "Session" is changed
     useEffect(()=> {
         if(!active) return; // If the timer is idle do nothing, Otherwise...
-        const timer = timerFunc();
-        return (() => { // End of timer
-            console.log("Session/Break ended!");
-            audioEl.current?.play(); // Play audio
-            session.current = !session.current; // Toggle session status 
-            timerValue.current = 0; // Reset timer value
-            setTimerDisplay(0); // Reset timer value
-            timerFunc(); // Reruns the timer on next session / break
-        })
-    },[active]);
+        setTimerDisplay(0); // Reset timer value
+        timerFunc();
+    },[active, session]);
 
     // Lengths changed
     useEffect(()=>{

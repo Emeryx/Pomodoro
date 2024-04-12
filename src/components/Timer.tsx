@@ -34,6 +34,8 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, session, t
     const timeFormatter = (length: number) => {
         const min: string = ( length / 60 ) < 10 ? `0${Math.floor(length/60)}` : `${Math.floor(length/60)}` ;
         const sec : string = ( length % 60 ) < 10 ? `0${length%60}` : `${length%60}` ;
+        const text = document.querySelector(".CircularProgressbar-text") as HTMLElement;
+        if(text) text.innerText = `${min}:${sec}`;
         return `${min}:${sec}`;
     };
 
@@ -44,7 +46,7 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, session, t
     // Component loaded - Set Circular progressbar text ID to "time-left"
     useLayoutEffect(() => {
         console.log("inner html set");
-        const text = document.querySelector(".CircularProgressbar-text");
+        const text = document.querySelector(".CircularProgressbar-text") as HTMLElement;
         console.log(text);
         if (!text) return;
         text.setAttribute("id", "time-left");
@@ -52,7 +54,6 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, session, t
 
     const runTimer = () => {
         console.log(`Session / Break ended and timer is active!\nStarting ${session ? "session" : "break"}\n--------------------------`);
-    
         // Clear any existing interval before starting a new one
         if (intervalRef.current) {
             clearInterval(intervalRef.current);
@@ -79,17 +80,18 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, session, t
                 pausedTimerValue.current = 0;
                 toggleSession();
             }
-        }, 1000);
+        }, 100);
     }
 
     // "Active" or "Session" is changed or component is loaded
     useEffect(()=> {
         console.log("Active status: "+active)
         runTimer();
-    },[active, session])
+    },[active, session, sessionLength, breakLength])
 
     // Lengths changed
     useEffect(()=>{
+        const text = document.querySelector(".CircularProgressbar-text") as HTMLElement;
         setFormattedTime(timeFormatter(session?sessionLength:breakLength));
     }, [sessionLength, breakLength])
 
@@ -116,7 +118,7 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, session, t
                 textSize: "24px",
 
                 // How long animation takes to go from one percentage to another, in seconds
-                pathTransitionDuration: 1,
+                pathTransitionDuration: 0.25,
 
                 // Can specify path transition in more detail, or remove it entirely
                 // pathTransition: 'none',

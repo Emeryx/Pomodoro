@@ -7,18 +7,17 @@ import SessionConfig from "./components/SessionConfig";
 import TimerTwo from "./components/Timer";
 import Control from "./components/Control";
 
-// TODO: Handle #time-left and the timer mechanism in general since there is no time state and the play/pause function does nothing. Time should be displayed in MM:SS format
-// TODO: My idea is to create one new state which is the numbers of seconds left, I can then parse the minutes left into MM:SS format and send it as a prop to #time-left to use
-// TODO: Write the pause function to pause the timer whenever it is clicked and play it again when pressed again
-// TODO: Handle what happens when timer reaches zero: Switching between break and session, Play the audio file in ./assets/Beep.mp3, And perform a new count down from the next phase whether it be session or length depending
+// TODO: Handle #time-left test not passing
+// TODO: Handle playing the audio file in ./assets/Beep.mp3
+// TODO: OPTIONALLY make the control and config buttons not work if the timer is active
 
 function App() {
 
     // State hooks
 
-    const [breakLength, setBreakLength] = useState(2); // in minutes
+    const [breakLength, setBreakLength] = useState(1); // in minutes
 
-    const [sessionLength, setSessionLength] = useState(1); // in minutes
+    const [sessionLength, setSessionLength] = useState(2); // in minutes
 
     const [session, toggleSession] = useState(true); // true at first because a session will have to begin
 

@@ -1,7 +1,7 @@
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import GradientSVG from "../utils/GradientSVG";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useLayoutEffect } from "react";
 
 const Timer = () => {
   return (
@@ -39,8 +39,10 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, session, t
 
     const [formattedTime, setFormattedTime] = useState(timeFormatter(session?sessionLength:breakLength));
 
+    const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
     // Component loaded - Set Circular progressbar text ID to "time-left"
-    useEffect(() => {
+    useLayoutEffect(() => {
         console.log("inner html set");
         const text = document.querySelector(".CircularProgressbar-text");
         console.log(text);
@@ -49,28 +51,40 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, session, t
     },[]);
 
     const runTimer = () => {
-        const interval = setInterval(()=>{ // Increment timerValue every 1000ms (1 second)
-            if(( ( ( pausedTimerValue.current < sessionLength && session ) || (pausedTimerValue.current < breakLength && !session ) ) && ( active ) )){
-                pausedTimerValue.current++;
-                setTimerDisplay(pausedTimerValue.current);
-                setFormattedTime(session?timeFormatter(sessionLength-pausedTimerValue.current):timeFormatter(breakLength-pausedTimerValue.current));
-                console.log("TIMER: "+pausedTimerValue.current);
+        console.log(`Session / Break ended and timer is active!\nStarting ${session ? "session" : "break"}\n--------------------------`);
+    
+        // Clear any existing interval before starting a new one
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+        }
+    
+        // Start a new interval
+        intervalRef.current = setInterval(() => {
+            // If not active, clear the interval and return
+            if (!active) {
+                clearInterval(intervalRef.current!);
+                console.log("Timer paused.");
+                return;
             }
-            else if(( pausedTimerValue.current === sessionLength && session ) || (pausedTimerValue.current === breakLength && !session )){
-                clearInterval(interval);
+    
+            // Increment timerValue every second
+            pausedTimerValue.current++;
+            setTimerDisplay(pausedTimerValue.current);
+            setFormattedTime(session ? timeFormatter(sessionLength - pausedTimerValue.current) : timeFormatter(breakLength - pausedTimerValue.current));
+            console.log("TIMER: " + pausedTimerValue.current);
+    
+            // When time reaches session/break length
+            if ((pausedTimerValue.current === sessionLength && session) || (pausedTimerValue.current === breakLength && !session)) {
+                clearInterval(intervalRef.current!);
+                pausedTimerValue.current = 0;
                 toggleSession();
             }
-        },1000); 
-        return () => {
-            clearInterval(interval);
-        }
+        }, 1000);
     }
 
-    // "Active" or "Session" is changed
+    // "Active" or "Session" is changed or component is loaded
     useEffect(()=> {
-        if(!active) return; // If the timer is idle do nothing, Otherwise...
-        pausedTimerValue.current = 0;
-        console.log(`Session / Break ended and timer is active!\nStarting ${session?"session":"break"}`);
+        console.log("Active status: "+active)
         runTimer();
     },[active, session])
 

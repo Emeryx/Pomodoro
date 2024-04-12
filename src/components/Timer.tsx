@@ -37,9 +37,9 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength , breakLength , active }
 
     const [session,setSession] = useState(true);
 
-    const audioEl = useRef<HTMLAudioElement | null>();
+    const pausedFlag = useRef(false);
 
-    const [timerDisplay, setTimerDisplay] = useState(0);
+    const audioEl = useRef<HTMLAudioElement | null>();    const [timerDisplay, setTimerDisplay] = useState(0);
     
     const timeFormatter = (length: number) => {
         const min: string = ( length / 60 ) < 10 ? `0${Math.floor(length/60)}` : `${Math.floor(length/60)}` ;
@@ -59,9 +59,12 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength , breakLength , active }
 
     const timerFunc = () => {
         console.log("New session/break begin/resume!");
+        if(!pausedFlag.current){
+            timerValue.current = 0;
+        }
         const interval = setInterval(()=>{ // Increment timerValue every 1000ms (1 second)
             if(( (( timerValue.current < sessionLength && session ) || (timerValue.current < breakLength && !session )) && active )){
-                console.log(!active);
+                console.log(active);
                 timerValue.current++;
                 setTimerDisplay(timerValue.current);
                 setFormattedTime(session?timeFormatter(sessionLength-timerValue.current):timeFormatter(breakLength-timerValue.current));
@@ -69,17 +72,18 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength , breakLength , active }
             }
             else{
                 if(active){
+                    pausedFlag.current = false;
                     console.log("Session/break ended!");
                     audioEl.current?.play(); // Play audio
                     setSession(!session); // Toggle session status 
                 }
                 else{
                     console.log("Is inactive! oopsie");
+                    pausedFlag.current = true;
                     timerValue.current = timerDisplay;
                 }
-                clearInterval(interval);
             }
-        },1000);
+        },200);
         return () => clearInterval(interval); 
     }
     // "Active" or "Session" is changed
@@ -96,7 +100,7 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength , breakLength , active }
 
     return (
         <div id="timer-container">
-            <audio id="beep" className="" onLoadedData={retrieveAudio} controls>
+            <audio id="beep" className="hidden" onLoadedData={retrieveAudio} controls>
                 <source src="https://www.soundjay.com/buttons/sounds/button-2.mp3" type="audio/mpeg"/>
             </audio>
             <GradientSVG />

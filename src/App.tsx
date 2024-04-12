@@ -47,6 +47,7 @@ function App() {
 
     const pause = () => {
         toggleActive(prevActive => !prevActive);
+        console.log(active);
     }
 
     return (

@@ -17,16 +17,17 @@ interface TimerProps {
   sessionLength: number; // session length in seconds
   breakLength: number; // break length in seconds
   session: boolean; // true - a session is in place, false - a break is in place
+  toggleSession: Function;
   active: boolean; // true - timer is active, false - timer is idle
 }
 
-const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, session, active }) => { // lengths had already been multiplied by 60
+const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, session, toggleSession, active }) => { // lengths had already been multiplied by 60
   
     const idCSS = "gradient";
 
     // const [timerValue, setTimerValue] = useState(0);
 
-    const timerValue = useRef(0);
+    const pausedTimerValue = useRef(0);
 
     const [timerDisplay, setTimerDisplay] = useState(0);
 
@@ -38,35 +39,40 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, session, a
 
     const [formattedTime, setFormattedTime] = useState(timeFormatter(session?sessionLength:breakLength));
 
-    // Component loaded & active changed - Set Circular progressbar text ID to "time-left"
+    // Component loaded - Set Circular progressbar text ID to "time-left"
     useEffect(() => {
         console.log("inner html set");
         const text = document.querySelector(".CircularProgressbar-text");
         console.log(text);
         if (!text) return;
         text.setAttribute("id", "time-left");
-    }, [active]);
+    },[]);
 
-    // "Active" is changed
-    useEffect(()=> {
-        if(!active) return; // If the timer is idle do nothing, Otherwise...
+    const runTimer = () => {
         const interval = setInterval(()=>{ // Increment timerValue every 1000ms (1 second)
-            if(( ( timerValue.current < sessionLength && session ) || (timerValue.current < breakLength && !session ) && active )){
-                timerValue.current++;
-                setTimerDisplay(timerValue.current);
-                setFormattedTime(session?timeFormatter(sessionLength-timerValue.current):timeFormatter(breakLength-timerValue.current));
-                console.log("TIMER: "+timerValue.current);
+            if(( ( ( pausedTimerValue.current < sessionLength && session ) || (pausedTimerValue.current < breakLength && !session ) ) && ( active ) )){
+                pausedTimerValue.current++;
+                setTimerDisplay(pausedTimerValue.current);
+                setFormattedTime(session?timeFormatter(sessionLength-pausedTimerValue.current):timeFormatter(breakLength-pausedTimerValue.current));
+                console.log("TIMER: "+pausedTimerValue.current);
             }
-            else{
+            else if(( pausedTimerValue.current === sessionLength && session ) || (pausedTimerValue.current === breakLength && !session )){
                 clearInterval(interval);
+                toggleSession();
             }
         },1000); 
         return () => {
-            const audioEl = document.getElementById("beep") as HTMLAudioElement;
-            audioEl?.play();
             clearInterval(interval);
         }
-    },[active])
+    }
+
+    // "Active" or "Session" is changed
+    useEffect(()=> {
+        if(!active) return; // If the timer is idle do nothing, Otherwise...
+        pausedTimerValue.current = 0;
+        console.log(`Session / Break ended and timer is active!\nStarting ${session?"session":"break"}`);
+        runTimer();
+    },[active, session])
 
     // Lengths changed
     useEffect(()=>{

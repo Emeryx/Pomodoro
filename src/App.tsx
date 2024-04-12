@@ -16,9 +16,9 @@ function App() {
 
     // State hooks
 
-    const [breakLength, setBreakLength] = useState(5); // in minutes
+    const [breakLength, setBreakLength] = useState(2); // in minutes
 
-    const [sessionLength, setSessionLength] = useState(25); // in minutes
+    const [sessionLength, setSessionLength] = useState(1); // in minutes
 
     const [session, toggleSession] = useState(true); // true at first because a session will have to begin
 
@@ -38,6 +38,11 @@ function App() {
         else if(!increment && (sessionLength - 1) > 0) return setSessionLength(sessionLength - 1);
     }
 
+    const changeSession = () => {
+        console.log("Toggling session...");
+        toggleSession(!session);
+    } 
+
     // Reset function
 
     const reset = () => {
@@ -53,7 +58,7 @@ function App() {
 
     return (
         <div className="App flex flex-col gap-6 justify-center pb-40 md:mx-32 mx-8">
-        <TimerTwo sessionLength={sessionLength*60} breakLength={breakLength*60} session={session} active={active} />
+        <TimerTwo sessionLength={sessionLength*60} breakLength={breakLength*60} session={session} toggleSession={changeSession} active={active} />
         <Control resetFunc={reset} startStopFunc={pause} />
         <div
             id="configuration-container"

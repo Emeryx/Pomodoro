@@ -19,9 +19,10 @@ interface TimerProps {
   session: boolean; // true - a session is in place, false - a break is in place
   toggleSession: Function;
   active: boolean; // true - timer is active, false - timer is idle
+  pausedType: string | null; // paused type: "reset" or "pause"
 }
 
-const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, session, toggleSession, active }) => { // lengths had already been multiplied by 60
+const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, session, toggleSession, active, pausedType }) => { // lengths had already been multiplied by 60
   
     const idCSS = "gradient";
 
@@ -62,9 +63,16 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, session, t
         // Start a new interval
         intervalRef.current = setInterval(() => {
             // If not active, clear the interval and return
-            if (!active) {
+            if (!active) { // Handle pause
                 clearInterval(intervalRef.current!);
-                console.log("Timer paused.");
+                if(pausedType==="pause"){
+                    console.log("Timer paused.");
+                }
+                else if(pausedType==="reset"){
+                    pausedTimerValue.current = 0;
+                    setFormattedTime(session ? timeFormatter(sessionLength) : timeFormatter(breakLength));
+                    console.log("Timer reset.");
+                }
                 return;
             }
     
@@ -80,18 +88,17 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, session, t
                 pausedTimerValue.current = 0;
                 toggleSession();
             }
-        }, 100);
+        }, 1000);
     }
 
     // "Active" or "Session" is changed or component is loaded
     useEffect(()=> {
         console.log("Active status: "+active)
         runTimer();
-    },[active, session, sessionLength, breakLength])
+    },[active, session, pausedType])
 
     // Lengths changed
     useEffect(()=>{
-        const text = document.querySelector(".CircularProgressbar-text") as HTMLElement;
         setFormattedTime(timeFormatter(session?sessionLength:breakLength));
     }, [sessionLength, breakLength])
 

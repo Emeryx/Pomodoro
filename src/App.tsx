@@ -7,7 +7,6 @@ import SessionConfig from "./components/SessionConfig";
 import TimerTwo from "./components/Timer";
 import Control from "./components/Control";
 
-// TODO: Handle #time-left test not passing
 // TODO: Handle playing the audio file in ./assets/Beep.mp3
 // TODO: OPTIONALLY make the control and config buttons not work if the timer is active
 
@@ -15,13 +14,15 @@ function App() {
 
     // State hooks
 
-    const [breakLength, setBreakLength] = useState(1); // in minutes
+    const [breakLength, setBreakLength] = useState(5); // in minutes
 
-    const [sessionLength, setSessionLength] = useState(2); // in minutes
+    const [sessionLength, setSessionLength] = useState(25); // in minutes
 
     const [session, toggleSession] = useState(true); // true at first because a session will have to begin
 
     const [active, toggleActive] = useState(false); // false at first because it's idle
+
+    const [pausedType, setPausedType] = useState< "pause" | "reset" | null >(null);
 
     // Modifying functions for the config container
 
@@ -45,19 +46,22 @@ function App() {
     // Reset function
 
     const reset = () => {
+        toggleActive(false);
         setBreakLength(5);
         setSessionLength(25);
+        setPausedType("reset");
     }
 
     // Pause function
 
     const pause = () => {
         toggleActive(!active);
+        setPausedType("pause");
     }
 
     return (
         <div className="App flex flex-col gap-6 justify-center pb-40 md:mx-32 mx-8">
-        <TimerTwo sessionLength={sessionLength*60} breakLength={breakLength*60} session={session} toggleSession={changeSession} active={active} />
+        <TimerTwo sessionLength={sessionLength*60} breakLength={breakLength*60} session={session} toggleSession={changeSession} active={active} pausedType={pausedType} />
         <Control resetFunc={reset} startStopFunc={pause} />
         <div
             id="configuration-container"

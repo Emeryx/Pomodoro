@@ -62,19 +62,6 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, session, t
     
         // Start a new interval
         intervalRef.current = setInterval(() => {
-            // If not active, clear the interval and return
-            if (!active) { // Handle pause
-                clearInterval(intervalRef.current!);
-                if(pausedType==="pause"){
-                    console.log("Timer paused.");
-                }
-                else if(pausedType==="reset"){
-                    pausedTimerValue.current = 0;
-                    setFormattedTime(session ? timeFormatter(sessionLength) : timeFormatter(breakLength));
-                    console.log("Timer reset.");
-                }
-                return;
-            }
     
             // Increment timerValue every second
             pausedTimerValue.current++;
@@ -92,10 +79,27 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, session, t
     }
 
     // "Active" or "Session" is changed or component is loaded
-    useEffect(()=> {
+    /*useEffect(()=> {
         console.log("Active status: "+active)
         runTimer();
-    },[active, session, pausedType])
+    },[active, session])*/
+
+    useEffect(()=> {
+        if(active){
+            runTimer();
+            return;
+        }
+        if(pausedType==="pause"){
+            console.log("Timer paused.");
+        }
+        else if(pausedType==="reset"){
+            pausedTimerValue.current = 0;
+            setFormattedTime(session ? timeFormatter(sessionLength) : timeFormatter(breakLength));
+            setTimerDisplay(0);
+            console.log("Timer reset.");
+        }
+        clearInterval(intervalRef.current!);
+    },[pausedType, session])
 
     // Lengths changed
     useEffect(()=>{

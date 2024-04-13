@@ -54,9 +54,14 @@ function App() {
 
     // Pause function
 
-    const pause = () => {
+    const pause = () => { // Pause function
         toggleActive(!active);
-        setPausedType("pause");
+        if(!active){
+            setPausedType("pause");
+        }
+        else{
+            setPausedType(null);
+        }
     }
 
     return (

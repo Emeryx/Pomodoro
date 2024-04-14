@@ -20,20 +20,18 @@ function App() {
 
     const [session, toggleSession] = useState(true); // true at first because a session will have to begin
 
-    const [active, toggleActive] = useState(false); // false at first because it's idle
-
-    const [pausedType, setPausedType] = useState< "pause" | "reset" | null >(null);
+    const [pausedType, setPausedType] = useState< "pause" | "reset" | "run" | null >(null);
 
     // Modifying functions for the config container
 
     const modifyBreak = (increment: boolean) => {
-        if(active) return; // Don't do anything if active, toggleActive(false) may be needed in the future
+        if(pausedType==="run") return; // Don't do anything if active, toggleActive(false) may be needed in the future
         if (increment && (breakLength + 1 ) <= 60) return setBreakLength(breakLength + 1);
         else if(!increment && (breakLength - 1) > 0) return setBreakLength(breakLength - 1);
     };
 
     const modifySession = (increment: boolean) => {
-        if(active) return; // Don't do anything if active, toggleActive(false) may be needed in the future
+        if(pausedType==="run") return; // Don't do anything if active, toggleActive(false) may be needed in the future
         if (increment && (sessionLength + 1 ) <= 60) return setSessionLength(sessionLength + 1);
         else if(!increment && (sessionLength - 1) > 0) return setSessionLength(sessionLength - 1);
     }
@@ -46,7 +44,6 @@ function App() {
     // Reset function
 
     const reset = () => {
-        toggleActive(false);
         setBreakLength(5);
         setSessionLength(25);
         setPausedType("reset");
@@ -55,18 +52,17 @@ function App() {
     // Pause function
 
     const pause = () => { // Pause function
-        toggleActive(!active);
-        if(!active){
+        if(pausedType==="run"){
             setPausedType("pause");
         }
         else{
-            setPausedType(null);
+            setPausedType("run");
         }
     }
 
     return (
         <div className="App flex flex-col gap-6 justify-center pb-40 md:mx-32 mx-8">
-        <TimerTwo sessionLength={sessionLength*60} breakLength={breakLength*60} session={session} toggleSession={changeSession} active={active} pausedType={pausedType} />
+        <TimerTwo sessionLength={sessionLength*60} breakLength={breakLength*60} session={session} toggleSession={changeSession} pausedType={pausedType} />
         <Control resetFunc={reset} startStopFunc={pause} />
         <div
             id="configuration-container"

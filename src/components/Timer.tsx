@@ -18,11 +18,10 @@ interface TimerProps {
   breakLength: number; // break length in seconds
   session: boolean; // true - a session is in place, false - a break is in place
   toggleSession: Function;
-  active: boolean; // true - timer is active, false - timer is idle
   pausedType: string | null; // paused type: "reset" or "pause"
 }
 
-const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, session, toggleSession, active, pausedType }) => { // lengths had already been multiplied by 60
+const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, session, toggleSession, pausedType }) => { // lengths had already been multiplied by 60
   
     const idCSS = "gradient";
 
@@ -63,18 +62,20 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, session, t
         // Start a new interval
         intervalRef.current = setInterval(() => {
     
+            // When time reaches session/break length
+            if ((pausedTimerValue.current === sessionLength && session) || (pausedTimerValue.current === breakLength && !session) || pausedType!=="run") {
+                clearInterval(intervalRef.current!);
+                pausedTimerValue.current = 0;
+                toggleSession();
+                return;
+            }
+
             // Increment timerValue every second
             pausedTimerValue.current++;
             setTimerDisplay(pausedTimerValue.current);
             setFormattedTime(session ? timeFormatter(sessionLength - pausedTimerValue.current) : timeFormatter(breakLength - pausedTimerValue.current));
             console.log("TIMER: " + pausedTimerValue.current);
     
-            // When time reaches session/break length
-            if ((pausedTimerValue.current === sessionLength && session) || (pausedTimerValue.current === breakLength && !session)) {
-                clearInterval(intervalRef.current!);
-                pausedTimerValue.current = 0;
-                toggleSession();
-            }
         }, 1000);
     }
 
@@ -84,8 +85,9 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, session, t
         runTimer();
     },[active, session])*/
 
+    // Timer activate / reactivate / pause
     useEffect(()=> {
-        if(active){
+        if(pausedType==="run"){
             runTimer();
             return;
         }
@@ -100,6 +102,13 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, session, t
         }
         clearInterval(intervalRef.current!);
     },[pausedType, session])
+
+    // Session change
+    useEffect(()=>{
+        pausedTimerValue.current = 0;
+        setFormattedTime(session ? timeFormatter(sessionLength) : timeFormatter(breakLength));
+        setTimerDisplay(0);
+    },[session])
 
     // Lengths changed
     useEffect(()=>{

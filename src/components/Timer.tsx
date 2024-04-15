@@ -26,12 +26,11 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, timerState
     const idCSS = "gradient";
 
     // const [timerValue, setTimerValue] = useState(0);
-
-    useEffect(() => {
-        // Log timerDisplay whenever it changes
-        console.log(timerState);
-    }, [timerState]);
     
+    useEffect(()=>{
+        console.log(timerState);
+    },[timerState])
+
     const timeFormatter = (length: number) => {
         const min: string = ( length / 60 ) < 10 ? `0${Math.floor(length/60)}` : `${Math.floor(length/60)}` ;
         const sec : string = ( length % 60 ) < 10 ? `0${length%60}` : `${length%60}` ;
@@ -39,11 +38,6 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, timerState
         if(text) text.innerText = `${min}:${sec}`;
         return `${min}:${sec}`;
     };
-
-    const [formattedTime, setFormattedTime] = useState(timeFormatter(timerState.timerType==="Session"?sessionLength:breakLength));
-
-
-    const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
     // Component loaded - Set Circular progressbar text ID to "time-left"
     useEffect(() => {
@@ -54,77 +48,22 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, timerState
         text.setAttribute("id", "time-left");
     },[]);
 
-
-    const changeSession = () => {
+    const changeTimerType = () => {
         console.log("Switching between session and break or vice versa...");
         setTimerState( (prev : TimerDisplay) =>({
             ...prev,
             timerType: prev.timerType==="Session" ? "Break" : "Session",
             time: 0
         }))
-    } 
-
-    const runTimer = () => {
-        console.log(`Session / Break ended and timer is active!\nStarting ${timerState.timerType==="Session" ? "session" : "break"}\n--------------------------`);
-
-        // Start a new interval
-        intervalRef.current = setInterval(() => {
-
-            // Increment timerValue every second
-            pausedTimerValue.current++;
-            setTimerState( (prev : TimerDisplay) =>({
-                ...prev,
-                time: prev.time + 1
-            }))
-            setFormattedTime(timerState.timerType==="Session" ? timeFormatter(sessionLength - pausedTimerValue.current) : timeFormatter(breakLength - pausedTimerValue.current));
-            console.log("TIMER: " + pausedTimerValue.current);
-            
-        }, 1000);
     }
-
-    // Time reaches max value
-    useEffect(()=>{
-        if ((timerState.time >= sessionLength && timerState.timerType==="Session") || (timerState.time >= breakLength && timerState.timerType==="Break")) {
-            clearInterval(intervalRef.current!);
-            setTimeout(()=>{
-                changeSession();
-                return;
-            },1000)
-        }
-    },[timerState.time])
-
-    // Timer activate / reactivate / pause
-    useEffect(()=> {
-        console.log("Timer status: "+timerState.timerStatus);
-        if(timerState.timerStatus==="Running"){
-            runTimer();
-            return;
-        }
-        if(timerState.timerStatus==="Paused"){
-            console.log("Timer paused.");
-        }
-        else if(timerState.timerStatus==="Resetted"){
-            setTimerState({
-                timerStatus: "Paused",
-                timerType: "Session",
-                time: 0
-            })
-            pausedTimerValue.current = 0;
-            setFormattedTime(timerState.timerType==="Session" ? timeFormatter(sessionLength) : timeFormatter(breakLength));
-            console.log("Timer reset.");
-        }
-        clearInterval(intervalRef.current!);
-    },[timerState.timerStatus, timerState.timerType])
-
-    // Timer type change and timer value set to zero
-    useEffect(()=>{
-        pausedTimerValue.current = 0;
-        setFormattedTime(timerState.timerType==="Session" ? timeFormatter(sessionLength) : timeFormatter(breakLength));
-    },[timerState.timerType])
 
     // Lengths / Timer type changed
     useEffect(()=>{
-        setFormattedTime(timeFormatter(timerState.timerType==="Session"?sessionLength:breakLength));
+        setTimerState({
+            timerStatus: "Paused",
+			timerType: "Session",
+			time: sessionLength
+        })
     }, [sessionLength, breakLength, timerState.timerType])
 
     return (
@@ -133,8 +72,8 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, timerState
             <GradientSVG />
             <CircularProgressbar
                 className="w-48 h-48"
-                value={timerState.time}
-                text={formattedTime}
+                value={timerState.timerType === "Session?" ? sessionLength - timerState.time : breakLength - timerState.time}
+                text={timeFormatter(timerState.time)}
                 minValue={0}
                 maxValue={timerState.timerType==="Session"?sessionLength:breakLength}
                 strokeWidth={6}

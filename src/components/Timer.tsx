@@ -69,7 +69,7 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, timerState
 
     // Time reaches 0
     useEffect(()=>{
-        if(timerState.time === 0){
+        if(timerState.time === -1){
             changeTimerType();
         }
     },[timerState.time])

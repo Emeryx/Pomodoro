@@ -1,0 +1,18 @@
+{
+  "files": {
+    "main.css": "/Pomodoro/static/css/main.f1407af8.css",
+    "main.js": "/Pomodoro/static/js/main.a0b2a296.js",
+    "static/media/bg.jpg": "/Pomodoro/static/media/bg.557724ad1199b2827b70.jpg",
+    "static/media/JBMono.ttf": "/Pomodoro/static/media/JBMono.d08f929cab66fc19b568.ttf",
+    "static/media/Poppins.ttf": "/Pomodoro/static/media/Poppins.35d26b781dc5fda684cc.ttf",
+    "static/media/Poppins-SemiBold.ttf": "/Pomodoro/static/media/Poppins-SemiBold.ac8d04b620e54be9b0f0.ttf",
+    "static/media/Beep.mp3": "/Pomodoro/static/media/Beep.abcd3f62d8d844c05bef.mp3",
+    "index.html": "/Pomodoro/index.html",
+    "main.f1407af8.css.map": "/Pomodoro/static/css/main.f1407af8.css.map",
+    "main.a0b2a296.js.map": "/Pomodoro/static/js/main.a0b2a296.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.f1407af8.css",
+    "static/js/main.a0b2a296.js"
+  ]
+}

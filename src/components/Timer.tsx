@@ -13,11 +13,11 @@ const Timer = () => {
   );
 };
 
-interface TimerDisplay{timerStatus: string, timerType: string, time: number}
+interface TimerState{timerStatus: string, timerType: string, time: number}
 interface TimerProps {
   sessionLength: number; // session length in seconds
   breakLength: number; // break length in seconds
-    timerState: TimerDisplay;
+    timerState: TimerState;
     setTimerState: Function;
 }
 
@@ -50,12 +50,37 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, timerState
 
     const changeTimerType = () => {
         console.log("Switching between session and break or vice versa...");
-        setTimerState( (prev : TimerDisplay) =>({
+        setTimerState( (prev : TimerState) =>({
             ...prev,
             timerType: prev.timerType==="Session" ? "Break" : "Session",
-            time: 0
+            time: prev.timerType==="Session"?breakLength:sessionLength
         }))
     }
+
+    const decrementTime = () => {
+        setTimerState( (prev : TimerState) => {
+            timeFormatter(prev.time - 1);
+            return {
+                ...prev,
+                time: prev.time - 1
+            }
+        })
+    }
+
+    // Time reaches 0
+    useEffect(()=>{
+        if(timerState.time === 0){
+            changeTimerType();
+        }
+    },[timerState.time])
+    
+    // Paused / Running / Type changed
+    useEffect(()=>{
+        if(timerState.timerStatus === "Paused") return;
+        // Otherwise timerStatus = Running...
+        const interval = setInterval(decrementTime, 1000);
+        return () => clearInterval(interval)
+    },[timerState.timerStatus, timerState.timerType])
 
     // Lengths / Timer type changed
     useEffect(()=>{
@@ -64,7 +89,7 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, timerState
 			timerType: "Session",
 			time: sessionLength
         })
-    }, [sessionLength, breakLength, timerState.timerType])
+    }, [sessionLength, breakLength])
 
     return (
         <div id="timer-container">

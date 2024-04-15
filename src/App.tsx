@@ -62,7 +62,7 @@ function App() {
 
     return (
         <div className="App flex flex-col gap-6 justify-center pb-40 md:mx-32 mx-8">
-        <TimerTwo sessionLength={sessionLength*60} breakLength={breakLength*60} session={session} toggleSession={changeSession} pausedType={pausedType} />
+        <TimerTwo sessionLength={sessionLength*60} breakLength={breakLength*60} session={session} toggleSession={changeSession} pausedType={pausedType} setPausedType={setPausedType} />
         <Control resetFunc={reset} startStopFunc={pause} />
         <div
             id="configuration-container"

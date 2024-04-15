@@ -19,9 +19,10 @@ interface TimerProps {
   session: boolean; // true - a session is in place, false - a break is in place
   toggleSession: Function;
   pausedType: string | null; // paused type: "reset" or "pause"
+  setPausedType: Function;
 }
 
-const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, session, toggleSession, pausedType }) => { // lengths had already been multiplied by 60
+const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, session, toggleSession, pausedType, setPausedType }) => { // lengths had already been multiplied by 60
   
     const idCSS = "gradient";
 
@@ -59,22 +60,28 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, session, t
             clearInterval(intervalRef.current);
         }
     
+        let incrementTimer = true;
+
         // Start a new interval
         intervalRef.current = setInterval(() => {
     
             // When time reaches session/break length
-            if ((pausedTimerValue.current === sessionLength && session) || (pausedTimerValue.current === breakLength && !session) || pausedType!=="run") {
+            if ((pausedTimerValue.current >= sessionLength && session) || (pausedTimerValue.current >= breakLength && !session)) {
                 clearInterval(intervalRef.current!);
-                pausedTimerValue.current = 0;
-                toggleSession();
-                return;
+                incrementTimer = false;
+                setTimeout(()=>{
+                    toggleSession();
+                    return;
+                },1000)
             }
 
-            // Increment timerValue every second
-            pausedTimerValue.current++;
-            setTimerDisplay(pausedTimerValue.current);
-            setFormattedTime(session ? timeFormatter(sessionLength - pausedTimerValue.current) : timeFormatter(breakLength - pausedTimerValue.current));
-            console.log("TIMER: " + pausedTimerValue.current);
+            if(incrementTimer){
+                // Increment timerValue every second
+                pausedTimerValue.current++;
+                setTimerDisplay(pausedTimerValue.current);
+                setFormattedTime(session ? timeFormatter(sessionLength - pausedTimerValue.current) : timeFormatter(breakLength - pausedTimerValue.current));
+                console.log("TIMER: " + pausedTimerValue.current);
+            }
     
         }, 1000);
     }
@@ -95,10 +102,12 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, session, t
             console.log("Timer paused.");
         }
         else if(pausedType==="reset"){
+            toggleSession(true);
             pausedTimerValue.current = 0;
             setFormattedTime(session ? timeFormatter(sessionLength) : timeFormatter(breakLength));
             setTimerDisplay(0);
             console.log("Timer reset.");
+            setPausedType("pause");
         }
         clearInterval(intervalRef.current!);
     },[pausedType, session])

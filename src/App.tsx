@@ -20,7 +20,7 @@ function App() {
 
     const [sessionLength, setSessionLength] = useState(25); // in minutes
 
-    const [timerDisplay, setTimerDisplay] = useState<TimerDisplay>({
+    const [timerState, setTimerState] = useState<TimerDisplay>({
         timerStatus: "Paused",
         timerType: "Session",
         time: 0
@@ -29,13 +29,13 @@ function App() {
     // Modifying functions for the config container
 
     const modifyBreak = (increment: boolean) => {
-        if(timerDisplay.timerType==="Running") return; // Don't do anything if active, toggleActive(false) may be needed in the future
+        if(timerState.timerType==="Running") return; // Don't do anything if active, toggleActive(false) may be needed in the future
         if (increment && (breakLength + 1 ) <= 60) return setBreakLength(breakLength + 1);
         else if(!increment && (breakLength - 1) > 0) return setBreakLength(breakLength - 1);
     };
 
     const modifySession = (increment: boolean) => {
-        if(timerDisplay.timerType==="Running") return; // Don't do anything if active, toggleActive(false) may be needed in the future
+        if(timerState.timerType==="Running") return; // Don't do anything if active, toggleActive(false) may be needed in the future
         if (increment && (sessionLength + 1 ) <= 60) return setSessionLength(sessionLength + 1);
         else if(!increment && (sessionLength - 1) > 0) return setSessionLength(sessionLength - 1);
     }
@@ -45,7 +45,7 @@ function App() {
     const reset = () => {
         setBreakLength(5);
         setSessionLength(25);
-        setTimerDisplay(prev => ({
+        setTimerState(prev => ({
             ...prev,
             timerStatus:"Resetted"
         }))
@@ -54,7 +54,7 @@ function App() {
     // Pause function
 
     const pause = () => { // Pause function
-        setTimerDisplay(prev => ({
+        setTimerState(prev => ({
             ...prev,
             timerStatus : prev.timerStatus==="Running" ? "Paused" : "Running"
         }))
@@ -62,7 +62,7 @@ function App() {
 
     return (
         <div className="App flex flex-col gap-6 justify-center pb-40 md:mx-32 mx-8">
-        <TimerTwo sessionLength={sessionLength*60} breakLength={breakLength*60} timerDisplay={timerDisplay} setTimerDisplay={setTimerDisplay} />
+        <TimerTwo sessionLength={sessionLength*60} breakLength={breakLength*60} timerDisplay={timerState} setTimerDisplay={setTimerState} />
         <Control resetFunc={reset} startStopFunc={pause} />
         <div
             id="configuration-container"

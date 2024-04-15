@@ -2,18 +2,9 @@ import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import GradientSVG from "../utils/GradientSVG";
 import { useEffect, useState, useRef, useLayoutEffect } from "react";
+import beepSound from "../assets/Beep.mp3"
 
-const Timer = () => {
-  return (
-    <div id="timer-container">
-      <h3 id="time-left" className="text-4xl text-white">
-        25:00
-      </h3>
-    </div>
-  );
-};
-
-interface TimerState{timerStatus: string, timerType: string, time: number}
+interface TimerState{timerStatus: string, timerType: "Session" | "Break", time: number}
 interface TimerProps {
   sessionLength: number; // session length in seconds
   breakLength: number; // break length in seconds
@@ -21,11 +12,9 @@ interface TimerProps {
     setTimerState: Function;
 }
 
-const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, timerState, setTimerState }) => { // lengths had already been multiplied by 60
+const Timer: React.FC<TimerProps> = ({ sessionLength, breakLength, timerState, setTimerState }) => { // lengths had already been multiplied by 60
   
     const idCSS = "gradient";
-
-    // const [timerValue, setTimerValue] = useState(0);
     
     useEffect(()=>{
         console.log(timerState);
@@ -70,6 +59,8 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, timerState
     // Time reaches 0
     useEffect(()=>{
         if(timerState.time === -1){
+            const audio = document.getElementById("beep") as HTMLAudioElement;
+            audio.play();
             changeTimerType();
         }
     },[timerState.time])
@@ -91,16 +82,21 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, timerState
         })
     }, [sessionLength, breakLength])
 
+    // Lengths changed and timer type changed
+    useEffect(()=>{
+        console.log(`Progressbar Max value: ${timerState.timerType==="Session"?sessionLength:breakLength}\nSession Length: ${sessionLength}\nBreak Length: ${breakLength}\nTimer time: ${timerState.time}`)
+    },[timerState])
+
     return (
         <div id="timer-container">
-            <audio id="beep" src="../assets/Beep.mp3" className=""></audio>
+            <audio id="beep" src={beepSound} className=""></audio>
             <GradientSVG />
             <CircularProgressbar
                 className="w-48 h-48"
-                value={timerState.timerType === "Session?" ? sessionLength - timerState.time : breakLength - timerState.time}
+                value={timerState.timerType === "Session" ? sessionLength - timerState.time : breakLength - timerState.time}
                 text={timeFormatter(timerState.time)}
                 minValue={0}
-                maxValue={timerState.timerType==="Session"?sessionLength:breakLength}
+                maxValue={timerState.timerType === "Session" ? sessionLength : breakLength}
                 strokeWidth={6}
                 // counterClockwise={true}
                 styles={buildStyles({
@@ -133,4 +129,4 @@ const TimerTwo: React.FC<TimerProps> = ({ sessionLength, breakLength, timerState
     );
 };
 
-export default TimerTwo;
+export default Timer;
